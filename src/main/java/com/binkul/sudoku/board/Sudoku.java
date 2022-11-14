@@ -2,10 +2,13 @@ package com.binkul.sudoku.board;
 
 import com.binkul.sudoku.data.ConstantData;
 import com.binkul.sudoku.element.Cell;
+import com.binkul.sudoku.element.Number;
 import com.binkul.sudoku.element.Row;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -20,6 +23,66 @@ public class Sudoku {
 
     public Cell getCell(int row, int column) {
         return rows.get(row).getCell(column);
+    }
+
+    public List<Integer> getRowValues(int row) {
+        return rows.get(row).getCells().stream()
+                .map(Cell::getValue)
+                .filter(i -> i != ConstantData.NOT_SET_VALUE)
+                .collect(Collectors.toList());
+    }
+
+    public List<Integer> getColumnValues(int column) {
+        return rows.stream()
+                .map(Row::getCells)
+                .flatMap(Collection::stream)
+                .filter(i -> i.getColumn() == column)
+                .map(Cell::getValue)
+                .filter(i -> i != ConstantData.NOT_SET_VALUE)
+                .collect(Collectors.toList());
+    }
+
+    public List<Integer> getSectionValues(int section) {
+        return rows.stream()
+                .map(Row::getCells)
+                .flatMap(Collection::stream)
+                .filter(i -> i.getSection() == section)
+                .map(Cell::getValue)
+                .filter(i -> i != ConstantData.NOT_SET_VALUE)
+                .collect(Collectors.toList());
+    }
+
+    public Set<Integer> getExistingRowNumbers(int row) {
+        return rows.get(row).getCells().stream()
+                .map(Cell::getNumbers)
+                .flatMap(Collection::stream)
+                .filter(Number::exist)
+                .map(Number::getNumber)
+                .collect(Collectors.toSet());
+    }
+
+    public Set<Integer> getExistingColumnNumbers(int column) {
+        return rows.stream()
+                .map(Row::getCells)
+                .flatMap(Collection::stream)
+                .filter(i -> i.getColumn() == column)
+                .map(Cell::getNumbers)
+                .flatMap(Collection::stream)
+                .filter(Number::exist)
+                .map(Number::getNumber)
+                .collect(Collectors.toSet());
+    }
+
+    public Set<Integer> getExistingSectionNumbers(int section) {
+        return rows.stream()
+                .map(Row::getCells)
+                .flatMap(Collection::stream)
+                .filter(i -> i.getSection() == section)
+                .map(Cell::getNumbers)
+                .flatMap(Collection::stream)
+                .filter(Number::exist)
+                .map(Number::getNumber)
+                .collect(Collectors.toSet());
     }
 
     public static class SudokuBuilder {

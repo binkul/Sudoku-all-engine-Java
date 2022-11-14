@@ -35,16 +35,18 @@ public class Cell {
         return value;
     }
 
+    public int getSection() {
+        return section;
+    }
+
+    public int getColumn() { return column; }
+
     public List<Number> getNumbers() {
         return numbers;
     }
 
     public void setValue(int value) {
         this.value = value;
-    }
-
-    public int getSection() {
-        return section;
     }
 
     public void removeNumber(int number) {

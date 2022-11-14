@@ -20,6 +20,8 @@ public class Row {
         return cells.get(column);
     }
 
+    public List<Cell> getCells() { return cells; }
+
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder("|");
