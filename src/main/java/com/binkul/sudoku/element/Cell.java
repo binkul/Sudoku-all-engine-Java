@@ -55,6 +55,12 @@ public class Cell {
                 .forEach(Number::unsetExist);
     }
 
+    public long getNumbersSize() {
+        return numbers.stream()
+                .filter(Number::exist)
+                .count();
+    }
+
     public boolean isOnlyOneNumber() {
         return numbers.stream()
                 .filter(Number::exist)
