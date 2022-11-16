@@ -52,8 +52,9 @@ public class Sudoku {
                 .collect(Collectors.toList());
     }
 
-    public Set<Integer> getExistingRowNumbers(int row) {
+    public Set<Integer> getExistingRowNumbers(int row, Cell actualCell) {
         return rows.get(row).getCells().stream()
+                .filter(i -> !i.equals(actualCell))
                 .map(Cell::getNumbers)
                 .flatMap(Collection::stream)
                 .filter(Number::exist)
@@ -61,10 +62,11 @@ public class Sudoku {
                 .collect(Collectors.toSet());
     }
 
-    public Set<Integer> getExistingColumnNumbers(int column) {
+    public Set<Integer> getExistingColumnNumbers(int column, Cell actualCell) {
         return rows.stream()
                 .map(Row::getCells)
                 .flatMap(Collection::stream)
+                .filter(i -> !i.equals(actualCell))
                 .filter(i -> i.getColumn() == column)
                 .map(Cell::getNumbers)
                 .flatMap(Collection::stream)
@@ -73,10 +75,11 @@ public class Sudoku {
                 .collect(Collectors.toSet());
     }
 
-    public Set<Integer> getExistingSectionNumbers(int section) {
+    public Set<Integer> getExistingSectionNumbers(int section, Cell actualCell) {
         return rows.stream()
                 .map(Row::getCells)
                 .flatMap(Collection::stream)
+                .filter(i -> !i.equals(actualCell))
                 .filter(i -> i.getSection() == section)
                 .map(Cell::getNumbers)
                 .flatMap(Collection::stream)
