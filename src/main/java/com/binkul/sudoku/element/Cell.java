@@ -5,9 +5,11 @@ import com.binkul.sudoku.data.ConstantData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Cell {
     private int value;
+    private ValueType valueType;
     private final int section;
     private final int row;
     private final int column;
@@ -27,6 +29,7 @@ public class Cell {
     public Cell(int row, int column) {
         this.row = row;
         this.column = column;
+        valueType = ValueType.ENTERED;
         value = ConstantData.NOT_SET_VALUE;
         section = ConstantData.SECTION * (row / ConstantData.SECTION) + (column / ConstantData.SECTION);
     }
@@ -35,18 +38,36 @@ public class Cell {
         return value;
     }
 
+    public ValueType getValueType() {
+        return valueType;
+    }
+
     public int getSection() {
         return section;
     }
 
     public int getColumn() { return column; }
 
+    public int getRow() {
+        return row;
+    }
+
     public List<Number> getNumbers() {
         return numbers;
     }
 
+    public List<Number> getExistingNumbers() {
+        return numbers.stream()
+                .filter(Number::exist)
+                .collect(Collectors.toList());
+    }
+
     public void setValue(int value) {
         this.value = value;
+    }
+
+    public void setValueType(ValueType valueType) {
+        this.valueType = valueType;
     }
 
     public void removeNumber(int number) {

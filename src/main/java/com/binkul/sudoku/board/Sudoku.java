@@ -52,6 +52,20 @@ public class Sudoku {
                 .collect(Collectors.toList());
     }
 
+    public Set<Integer> getRowColSecValues(Cell cell) {
+        int row = cell.getRow();
+        int column = cell.getColumn();
+        int section = cell.getSection();
+        return rows.stream()
+                .map(Row::getCells)
+                .flatMap(Collection::stream)
+                .filter(i -> !i.equals(cell))
+                .filter(i -> i.getRow() == row || i.getColumn() == column || i.getSection() == section)
+                .map(Cell::getValue)
+                .filter(i -> i != ConstantData.NOT_SET_VALUE)
+                .collect(Collectors.toSet());
+    }
+
     public Set<Integer> getExistingRowNumbers(int row, Cell actualCell) {
         return rows.get(row).getCells().stream()
                 .filter(i -> !i.equals(actualCell))
@@ -86,6 +100,29 @@ public class Sudoku {
                 .filter(Number::exist)
                 .map(Number::getNumber)
                 .collect(Collectors.toSet());
+    }
+
+    public Sudoku deepCopy() {
+        Sudoku sudokuCopy = new Sudoku();
+
+        List<Cell> cells = rows.stream()
+                .map(Row::getCells)
+                .flatMap(Collection::stream).toList();
+
+        for (Cell cell : cells) {
+            Cell copyCell = sudokuCopy.getCell(cell.getRow(), cell.getColumn());
+            copyCell.setValue(cell.getValue());
+            copyCell.setValueType(cell.getValueType());
+
+            for (Number number : cell.getNumbers()) {
+                int index = number.getNumber();
+                Number copyNumber = copyCell.getNumbers().get(index - 1);
+                if (!number.exist()) copyNumber.unsetExist();
+                if (number.isChecked()) copyNumber.setChecked();
+            }
+        }
+
+        return sudokuCopy;
     }
 
     public static class SudokuBuilder {
