@@ -292,6 +292,53 @@ public class SudokuTestSuite {
         assertNotEquals(cell.getNumbers().get(1).isChecked(), cellCopy.getNumbers().get(1).isChecked());
     }
 
+    @Test
+    public void testFullFilledSudokuFalse() {
+        // Given Arrange
+        Sudoku sudoku = getTestSudoku();
+        // When Act
+        boolean result = sudoku.isAllFilled();
+        // Then Assert
+        assertFalse(result);
+    }
+
+    @Test
+    public void testFullFilledSudokuTrue() {
+        // Given Arrange
+        Sudoku sudoku = new Sudoku.SudokuBuilder().build();
+        for (int i = 0; i < ConstantData.WIDTH; i++) {
+            for (int j = 0; j < ConstantData.WIDTH; j++) {
+                sudoku.getCell(i, j).setValue(1);
+            }
+        }
+        // When Act
+        boolean result = sudoku.isAllFilled();
+        // Then Assert
+        assertTrue(result);
+    }
+
+    @Test
+    public void testIsPartiallyFilledCorrect() {
+        // Given Arrange
+        Sudoku sudoku = getTestSudoku();
+        // When Act
+        boolean result = sudoku.isAllFilledCorrect();
+        // Then Assert
+        assertTrue(result);
+    }
+
+    @Test
+    public void testIsPartiallyFilledWrong() {
+        // Given Arrange
+        Sudoku sudoku = getTestSudoku();
+        Cell cell = sudoku.getCell(0,0);
+        cell.setValue(2);
+        // When Act
+        boolean result = sudoku.isAllFilledCorrect();
+        // Then Assert
+        assertFalse(result);
+    }
+
     private Sudoku getTestSudoku() {
         return new Sudoku.SudokuBuilder()
                 .setCell(1, 1, 9)

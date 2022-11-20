@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -23,6 +24,43 @@ public class Sudoku {
 
     public Cell getCell(int row, int column) {
         return rows.get(row).getCell(column);
+    }
+
+    public boolean isAllFilled() {
+        return rows.stream()
+                .map(Row::getCells)
+                .flatMap(Collection::stream)
+                .noneMatch(i -> i.getValue() == ConstantData.NOT_SET_VALUE);
+    }
+
+    public boolean isAllFilledCorrect() {
+
+        if (IntStream.range(0, ConstantData.WIDTH)
+                .mapToObj(i -> isDuplicates(getRowValues(i)))
+                .anyMatch(i -> i)) return false;
+        if (IntStream.range(0, ConstantData.WIDTH)
+                .mapToObj(i -> isDuplicates(getColumnValues(i)))
+                .anyMatch(i -> i)) return false;
+        return IntStream.range(0, ConstantData.WIDTH)
+                .mapToObj(i -> isDuplicates(getSectionValues(i)))
+                .noneMatch(i -> i);
+
+//        for (int i = 0; i < ConstantData.WIDTH; i++) {
+//            if (isDuplicates(getRowValues(i))) return false;
+//        }
+//        for (int i = 0; i < ConstantData.WIDTH; i++) {
+//            if (isDuplicates(getColumnValues(i))) return false;
+//        }
+//        for (int i = 0; i < ConstantData.WIDTH; i++) {
+//            if (isDuplicates(getSectionValues(i))) return false;
+//        }
+    }
+
+    private boolean isDuplicates(List<Integer> inputs) {
+        return inputs.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet().stream()
+                .anyMatch(v -> v.getValue() > 1);
     }
 
     public List<Integer> getRowValues(int row) {
