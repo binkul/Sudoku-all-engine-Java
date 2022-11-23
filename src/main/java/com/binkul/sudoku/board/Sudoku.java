@@ -5,10 +5,7 @@ import com.binkul.sudoku.element.Cell;
 import com.binkul.sudoku.element.Number;
 import com.binkul.sudoku.element.Row;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -24,6 +21,13 @@ public class Sudoku {
 
     public Cell getCell(int row, int column) {
         return rows.get(row).getCell(column);
+    }
+
+    public List<Cell> getCells() {
+        return rows.stream()
+                .map(Row::getCells)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
     }
 
     public boolean isAllFilled() {
@@ -44,16 +48,6 @@ public class Sudoku {
         return IntStream.range(0, ConstantData.WIDTH)
                 .mapToObj(i -> isDuplicates(getSectionValues(i)))
                 .noneMatch(i -> i);
-
-//        for (int i = 0; i < ConstantData.WIDTH; i++) {
-//            if (isDuplicates(getRowValues(i))) return false;
-//        }
-//        for (int i = 0; i < ConstantData.WIDTH; i++) {
-//            if (isDuplicates(getColumnValues(i))) return false;
-//        }
-//        for (int i = 0; i < ConstantData.WIDTH; i++) {
-//            if (isDuplicates(getSectionValues(i))) return false;
-//        }
     }
 
     private boolean isDuplicates(List<Integer> inputs) {
@@ -91,17 +85,27 @@ public class Sudoku {
     }
 
     public Set<Integer> getRowColSecValues(Cell cell) {
-        int row = cell.getRow();
-        int column = cell.getColumn();
-        int section = cell.getSection();
-        return rows.stream()
-                .map(Row::getCells)
-                .flatMap(Collection::stream)
-                .filter(i -> !i.equals(cell))
-                .filter(i -> i.getRow() == row || i.getColumn() == column || i.getSection() == section)
-                .map(Cell::getValue)
-                .filter(i -> i != ConstantData.NOT_SET_VALUE)
-                .collect(Collectors.toSet());
+        List<Integer> rowValues = getRowValues(cell.getRow());
+        List<Integer> columnValues = getColumnValues(cell.getColumn());
+        List<Integer> sectionValues = getSectionValues(cell.getSection());
+        Set<Integer> values = new HashSet<>();
+        values.addAll(rowValues);
+        values.addAll(columnValues);
+        values.addAll(sectionValues);
+
+        return values;
+
+//        int row = cell.getRow();
+//        int column = cell.getColumn();
+//        int section = cell.getSection();
+//        return rows.stream()
+//                .map(Row::getCells)
+//                .flatMap(Collection::stream)
+//                .filter(i -> !i.equals(cell))
+//                .filter(i -> i.getRow() == row || i.getColumn() == column || i.getSection() == section)
+//                .map(Cell::getValue)
+//                .filter(i -> i != ConstantData.NOT_SET_VALUE)
+//                .collect(Collectors.toSet());
     }
 
     public Set<Integer> getExistingRowNumbers(int row, Cell actualCell) {
