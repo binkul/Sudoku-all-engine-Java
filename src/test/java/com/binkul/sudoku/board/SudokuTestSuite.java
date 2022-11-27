@@ -21,8 +21,8 @@ public class SudokuTestSuite {
         Sudoku sudoku = getTestSudoku();
 
         // When Act
-        List<Integer> values1 = sudoku.getRowValues(1);
-        List<Integer> values2 = sudoku.getRowValues(8);
+        List<Integer> values1 = sudoku.getValues(i -> i.getRow() == 1);
+        List<Integer> values2 = sudoku.getValues(i -> i.getRow() == 8);
 
         // Then Assert
         assertEquals(4, values1.size());
@@ -54,8 +54,8 @@ public class SudokuTestSuite {
         Sudoku sudoku = getTestSudoku();
 
         // When Act
-        List<Integer> values1 = sudoku.getColumnValues(0);
-        List<Integer> values2 = sudoku.getColumnValues(6);
+        List<Integer> values1 = sudoku.getValues(i -> i.getColumn() == 0);
+        List<Integer> values2 = sudoku.getValues(i -> i.getColumn() == 6);
 
         // Then Assert
         assertEquals(5, values1.size());
@@ -87,8 +87,8 @@ public class SudokuTestSuite {
         Sudoku sudoku = getTestSudoku();
 
         // When Act
-        List<Integer> values1 = sudoku.getSectionValues(4);
-        List<Integer> values2 = sudoku.getSectionValues(8);
+        List<Integer> values1 = sudoku.getValues(i -> i.getSection() == 4);
+        List<Integer> values2 = sudoku.getValues(i -> i.getSection() == 8);
 
         // Then Assert
         assertEquals(3, values1.size());
@@ -158,7 +158,10 @@ public class SudokuTestSuite {
             sudoku.getCell(0, i).getNumbers().get(8).unsetExist();
         }
         // When Act
-        Set<Integer> values = sudoku.getExistingRowNumbers(0, sudoku.getCell(0,0));
+        int row = 0;
+        Cell testCell = sudoku.getCell(row,0);
+        Set<Integer> values = sudoku.getExistingNumbers(i -> i.getRow() == row, testCell);
+        System.out.println(values);
 
         // Then Assert
         assertEquals(6, values.size());
@@ -177,7 +180,9 @@ public class SudokuTestSuite {
             sudoku.getCell(i, 1).getNumbers().get(8).unsetExist();
         }
         // When Act
-        Set<Integer> values = sudoku.getExistingColumnNumbers(1, sudoku.getCell(0,1));
+        int column = 1;
+        Cell testCell = sudoku.getCell(0, column);
+        Set<Integer> values = sudoku.getExistingNumbers(i -> i.getColumn() == column, testCell);
 
         // Then Assert
         assertEquals(6, values.size());
@@ -199,7 +204,9 @@ public class SudokuTestSuite {
             }
         }
         // When Act
-        Set<Integer> values = sudoku.getExistingSectionNumbers(4, sudoku.getCell(3,3));
+        int section = 4;
+        Cell testCell = sudoku.getCell(3,3);
+        Set<Integer> values = sudoku.getExistingNumbers(i -> i.getSection() == section, testCell);
 
         // Then Assert
         assertEquals(6, values.size());
