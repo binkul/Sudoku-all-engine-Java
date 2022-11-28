@@ -28,6 +28,10 @@ public class Row {
         for (Cell cell : cells) {
             if (cell.getValue() == ConstantData.NOT_SET_VALUE)
                 result.append("   |");
+            else if (cell.getValueType() == ValueType.SIMPLE_ALGORITHM)
+                result.append(" ")
+                        .append(cell.getValue())
+                        .append("s|");
             else
                 result.append(" ")
                         .append(cell.getValue())

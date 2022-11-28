@@ -1,19 +1,23 @@
 package com.binkul.sudoku;
 
 import com.binkul.sudoku.board.Sudoku;
+import com.binkul.sudoku.engine.SimpleSolver;
+import com.binkul.sudoku.engine.Solver;
 
 public class Application {
     public static void main(String[] args) {
         Sudoku sudoku = new Sudoku.SudokuBuilder()
                 .setCell(1, 1, 9)
+                .setCell(1, 2, 1)
                 .setCell(1, 3, 5)
+                .setCell(1, 4, 4)
                 .setCell(1, 5, 2)
                 .setCell(1, 6, 8)
+                .setCell(1, 7, 3)
                 .setCell(1, 9, 7)
                 .setCell(2, 2, 7)
                 .setCell(2, 6, 3)
                 .setCell(2, 7, 5)
-                .setCell(2, 9, 6)
                 .setCell(3, 2, 4)
                 .setCell(3, 4, 5)
                 .setCell(4, 1, 7)
@@ -38,6 +42,10 @@ public class Application {
                 .setCell(9, 9, 5)
                 .build();
 
+        System.out.println(sudoku);
+
+        Solver solver = new SimpleSolver(sudoku);
+        solver.Solve();
         System.out.println(sudoku);
     }
 }
