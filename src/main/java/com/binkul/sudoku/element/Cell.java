@@ -5,7 +5,6 @@ import com.binkul.sudoku.data.ConstantData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class Cell {
     private int value;
@@ -13,18 +12,19 @@ public class Cell {
     private final int section;
     private final int row;
     private final int column;
-    private final List<Number> numbers = new ArrayList<>(
-            List.of(
-                    new Number(1),
-                    new Number(2),
-                    new Number(3),
-                    new Number(4),
-                    new Number(5),
-                    new Number(6),
-                    new Number(7),
-                    new Number(8),
-                    new Number(9))
-    );
+    private final List<Integer> numbers = new ArrayList<>(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9));
+//    private final List<Number> numbers = new ArrayList<>(
+//            List.of(
+//                    new Number(1),
+//                    new Number(2),
+//                    new Number(3),
+//                    new Number(4),
+//                    new Number(5),
+//                    new Number(6),
+//                    new Number(7),
+//                    new Number(8),
+//                    new Number(9))
+//    );
 
     public Cell(int row, int column) {
         this.row = row;
@@ -52,14 +52,12 @@ public class Cell {
         return row;
     }
 
-    public List<Number> getNumbers() {
+    public List<Integer> getNumbers() {
         return numbers;
     }
 
-    public List<Number> getExistingNumbers() {
-        return numbers.stream()
-                .filter(Number::exist)
-                .collect(Collectors.toList());
+    public List<Integer> getExistingNumbers() {
+        return numbers;
     }
 
     public void setValue(int value) {
@@ -70,30 +68,20 @@ public class Cell {
         this.valueType = valueType;
     }
 
-    public void removeNumber(int number) {
-        numbers.stream()
-                .filter(n -> n.getNumber() == number)
-                .forEach(Number::unsetExist);
+    public void removeNumber(Integer number) {
+        numbers.remove(number);
     }
 
-    public long getNumbersSize() {
-        return numbers.stream()
-                .filter(Number::exist)
-                .count();
+    public int getNumbersSize() {
+        return numbers.size();
     }
 
     public boolean isOnlyOneNumber() {
-        return numbers.stream()
-                .filter(Number::exist)
-                .mapToInt(Number::getNumber)
-                .count() == 1;
+        return numbers.size() == 1;
     }
 
     public int getLastExistingNumber() {
-        return numbers.stream()
-                .filter(Number::exist)
-                .mapToInt(Number::getNumber)
-                .findFirst().orElse(ConstantData.NOT_SET_VALUE);
+        return numbers.stream().findFirst().orElse(ConstantData.NOT_SET_VALUE);
     }
 
     @Override

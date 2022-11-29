@@ -2,7 +2,6 @@ package com.binkul.sudoku.board;
 
 import com.binkul.sudoku.data.ConstantData;
 import com.binkul.sudoku.element.Cell;
-import com.binkul.sudoku.element.Number;
 import com.binkul.sudoku.element.ValueType;
 import com.binkul.sudoku.engine.Functions;
 import org.junit.jupiter.api.Test;
@@ -153,9 +152,9 @@ public class SudokuTestSuite {
         // Given Arrange
         Sudoku sudoku = getTestSudoku();
         for (int i = 1; i < ConstantData.WIDTH; i++) {
-            sudoku.getCell(0, i).getNumbers().get(0).unsetExist();
-            sudoku.getCell(0, i).getNumbers().get(4).unsetExist();
-            sudoku.getCell(0, i).getNumbers().get(8).unsetExist();
+            sudoku.getCell(0, i).removeNumber(1);
+            sudoku.getCell(0, i).removeNumber(5);
+            sudoku.getCell(0, i).removeNumber(9);
         }
         // When Act
         int row = 0;
@@ -175,9 +174,9 @@ public class SudokuTestSuite {
         // Given Arrange
         Sudoku sudoku = getTestSudoku();
         for (int i = 1; i < ConstantData.WIDTH; i++) {
-            sudoku.getCell(i, 1).getNumbers().get(0).unsetExist();
-            sudoku.getCell(i, 1).getNumbers().get(4).unsetExist();
-            sudoku.getCell(i, 1).getNumbers().get(8).unsetExist();
+            sudoku.getCell(i, 1).removeNumber(1);
+            sudoku.getCell(i, 1).removeNumber(5);
+            sudoku.getCell(i, 1).removeNumber(9);
         }
         // When Act
         int column = 1;
@@ -198,9 +197,9 @@ public class SudokuTestSuite {
         for (int i = 3; i < 6; i++) {
             for (int j = 3; j < 6; j++) {
                 if (i == 3 && j == 3) continue;
-                sudoku.getCell(i, j).getNumbers().get(0).unsetExist();
-                sudoku.getCell(i, j).getNumbers().get(4).unsetExist();
-                sudoku.getCell(i, j).getNumbers().get(8).unsetExist();
+                sudoku.getCell(i, j).removeNumber(1);
+                sudoku.getCell(i, j).removeNumber(5);
+                sudoku.getCell(i, j).removeNumber(9);
             }
         }
         // When Act
@@ -224,7 +223,7 @@ public class SudokuTestSuite {
         // When Act
         Set<Integer> values = sudoku.getRowColSecValues(cell);
         Functions.removeValuesFromNumbers(cell, new ArrayList<>(values));
-        List<Number> existingValues = cell.getExistingNumbers();
+        List<Integer> existingValues = cell.getExistingNumbers();
         // Then Assert
         System.out.println(values);
         System.out.println(existingValues);
@@ -290,13 +289,14 @@ public class SudokuTestSuite {
         Cell cell = sudoku.getCell(5,5);
         cell.setValueType(ValueType.SIMPLE_ALGORITHM);
         cell.setValue(9);
-        cell.getNumbers().get(1).setChecked();
+        cell.removeNumber(2);
         // When Act
         Cell cellCopy = sudokuCopy.getCell(5,5);
         // Then Assert
         assertNotEquals(cell.getValueType(), cellCopy.getValueType());
         assertNotEquals(cellCopy.getValue(), cell.getValue());
-        assertNotEquals(cell.getNumbers().get(1).isChecked(), cellCopy.getNumbers().get(1).isChecked());
+        assertEquals(8, cell.getNumbersSize());
+        assertEquals(9, cellCopy.getNumbersSize());
     }
 
     @Test

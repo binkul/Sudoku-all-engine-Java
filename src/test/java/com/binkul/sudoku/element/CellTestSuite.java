@@ -17,7 +17,7 @@ public class CellTestSuite {
         // Then Assert
         assertEquals(9, size);
         assertEquals(ConstantData.NOT_SET_VALUE,value);
-        assertFalse(cell.getNumbers().get(0).isChecked());
+        assertEquals(9, cell.getNumbersSize());
     }
 
     @Test
@@ -51,12 +51,20 @@ public class CellTestSuite {
         Cell cell = new Cell(0,0);
         // When Act
         cell.removeNumber(5);
-        Long size = cell.getNumbers().stream()
-                .filter(Number::exist)
-                .mapToInt(Number::getNumber)
-                .count();
+        cell.removeNumber(9);
+        int size = cell.getNumbersSize();
         // Then Assert
-        assertEquals(8, size);
+        System.out.println(cell.getNumbers());
+        assertEquals(7, size);
+        assertTrue(cell.getNumbers().contains(1));
+        assertTrue(cell.getNumbers().contains(2));
+        assertTrue(cell.getNumbers().contains(3));
+        assertTrue(cell.getNumbers().contains(4));
+        assertFalse(cell.getNumbers().contains(5));
+        assertTrue(cell.getNumbers().contains(6));
+        assertTrue(cell.getNumbers().contains(7));
+        assertTrue(cell.getNumbers().contains(8));
+        assertFalse(cell.getNumbers().contains(9));
     }
 
     @Test
@@ -73,6 +81,7 @@ public class CellTestSuite {
         cell.removeNumber(7);
         cell.removeNumber(8);
         // Then Assert
+        assertTrue(cell.getNumbers().contains(9));
         assertTrue(cell.isOnlyOneNumber());
     }
 
@@ -91,5 +100,23 @@ public class CellTestSuite {
         cell.removeNumber(9);
         // Then Assert
         assertEquals(5, cell.getLastExistingNumber());
+    }
+
+    @Test
+    public void testGetLastExistingNumberWhenNotExist() {
+        // Given Arrange
+        Cell cell = new Cell(0,0);
+        // When Act
+        cell.removeNumber(1);
+        cell.removeNumber(2);
+        cell.removeNumber(3);
+        cell.removeNumber(4);
+        cell.removeNumber(5);
+        cell.removeNumber(6);
+        cell.removeNumber(7);
+        cell.removeNumber(8);
+        cell.removeNumber(9);
+        // Then Assert
+        assertEquals(ConstantData.NOT_SET_VALUE, cell.getLastExistingNumber());
     }
 }

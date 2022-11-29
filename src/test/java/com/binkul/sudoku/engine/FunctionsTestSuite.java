@@ -2,7 +2,6 @@ package com.binkul.sudoku.engine;
 
 import com.binkul.sudoku.board.Sudoku;
 import com.binkul.sudoku.element.Cell;
-import com.binkul.sudoku.element.Number;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -20,10 +19,7 @@ public class FunctionsTestSuite {
         List<Integer> values = List.of(1, 4, 6, 8);
         // When Act
         boolean isRemoved = Functions.removeValuesFromNumbers(cell, values);
-        List<Integer> numbers = cell.getNumbers().stream()
-                .filter(Number::exist)
-                .map(Number::getNumber)
-                .toList();
+        List<Integer> numbers = cell.getNumbers();
         // Then Assert
         assertTrue(isRemoved);
         assertEquals(5, cell.getNumbersSize());
@@ -45,10 +41,7 @@ public class FunctionsTestSuite {
         List<Integer> values = List.of(1, 3, 4, 5, 6, 7, 8, 9);
         // When Act
         boolean isRemoved = Functions.removeValuesFromNumbers(cell, values);
-        List<Integer> numbers = cell.getNumbers().stream()
-                .filter(Number::exist)
-                .map(Number::getNumber)
-                .toList();
+        List<Integer> numbers = cell.getNumbers();
         // Then Assert
         assertTrue(isRemoved);
         assertTrue(cell.isOnlyOneNumber());
@@ -72,10 +65,7 @@ public class FunctionsTestSuite {
         // When Act
         Set<Integer> values = sudoku.getRowColSecValues(cell);
         boolean isRemoved = Functions.removeValuesFromNumbers(cell, new ArrayList<>(values));
-        List<Integer> numbers = cell.getNumbers().stream()
-                .filter(Number::exist)
-                .map(Number::getNumber)
-                .toList();
+        List<Integer> numbers = cell.getNumbers();
 
         // Then Assert
         assertEquals(4, numbers.size());

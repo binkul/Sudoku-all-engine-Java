@@ -3,14 +3,10 @@ package com.binkul.sudoku.engine;
 import com.binkul.sudoku.board.Sudoku;
 import com.binkul.sudoku.data.ConstantData;
 import com.binkul.sudoku.element.Cell;
-import com.binkul.sudoku.element.Number;
-import com.binkul.sudoku.element.Row;
 import com.binkul.sudoku.element.ValueType;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class SimpleSolver implements Solver {
 
@@ -48,9 +44,11 @@ public class SimpleSolver implements Solver {
     }
 
     private void removeValuesFromSingleCellNumbers(Cell cell, Set<Integer> values) {
-        cell.getNumbers().stream()
-                .filter(i -> values.contains(i.getNumber()))
-                .forEach(Number::unsetExist);
+        List<Integer> toRemove = cell.getNumbers().stream()
+                .filter(i -> values.contains(i))
+                .toList();
+
+        toRemove.forEach(i -> cell.removeNumber(i));
     }
 
 }

@@ -2,7 +2,6 @@ package com.binkul.sudoku.board;
 
 import com.binkul.sudoku.data.ConstantData;
 import com.binkul.sudoku.element.Cell;
-import com.binkul.sudoku.element.Number;
 import com.binkul.sudoku.element.Row;
 
 import java.util.*;
@@ -84,8 +83,6 @@ public class Sudoku {
                 .filter(position)
                 .map(Cell::getNumbers)
                 .flatMap(Collection::stream)
-                .filter(Number::exist)
-                .map(Number::getNumber)
                 .collect(Collectors.toSet());
     }
 
@@ -100,12 +97,10 @@ public class Sudoku {
             Cell copyCell = sudokuCopy.getCell(cell.getRow(), cell.getColumn());
             copyCell.setValue(cell.getValue());
             copyCell.setValueType(cell.getValueType());
+            copyCell.getNumbers().clear();
 
-            for (Number number : cell.getNumbers()) {
-                int index = number.getNumber();
-                Number copyNumber = copyCell.getNumbers().get(index - 1);
-                if (!number.exist()) copyNumber.unsetExist();
-                if (number.isChecked()) copyNumber.setChecked();
+            for (Integer number : cell.getNumbers()) {
+                copyCell.getNumbers().add(number);
             }
         }
 
