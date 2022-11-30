@@ -5,8 +5,10 @@ import com.binkul.sudoku.data.ConstantData;
 import com.binkul.sudoku.element.Cell;
 import com.binkul.sudoku.element.ValueType;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SimpleSolver implements Solver {
 
@@ -18,9 +20,38 @@ public class SimpleSolver implements Solver {
 
     @Override
     public Status Solve() {
-        removeValuesFromAllSudokuCells();
 
-        findAndSetSingleNumber();
+        List<Cell> cells = sudoku.getCells().stream()
+                .filter(i -> i.getRow() == 0).toList();
+        Set<Integer> values = new HashSet<>(sudoku.getValues(i -> i.getRow() == 0));
+        boolean anyChange = false;
+
+        for (Cell cell : cells) {
+            int valueChange = cell.getValue();
+            int sizeChange = cell.getNumbersSize();
+
+            if (cell.getValue() != ConstantData.NOT_SET_VALUE) continue;    // tylko dla pól bez numeru
+
+            removeValuesFromSingleCellNumbers(cell, values);                // usuń z możliwych wartości wpisane numery
+            if (cell.isNoneNumber()) {                                      // jak nc nie zostało to błąd
+                return Status.ERROR;
+            } else if (cell.isOnlyOneNumber()) {                            // jak jest tylko jedna możliwa wartość to ją wpisz
+                cell.setValue(cell.getLastExistingNumber());
+            } else {                                                        // jak więcej możliwości, to druga część algorytmu
+                Set<Integer> numbers = sudoku.getExistingNumbers(i -> i.getRow() == 0, cell);
+                int value = cell.getNumbers().stream()
+                                .filter(i -> !numbers.contains(i))
+                                .findFirst().orElse(ConstantData.NOT_SET_VALUE);
+                if (value != ConstantData.NOT_SET_VALUE) cell.setValue(value);
+            }
+
+            anyChange |= (valueChange != cell.getValue());
+            anyChange |= (sizeChange != cell.getNumbersSize());
+        }
+
+        //removeValuesFromAllSudokuCells();
+
+        //findAndSetSingleNumber();
 
         return null;
     }
@@ -43,12 +74,16 @@ public class SimpleSolver implements Solver {
         }
     }
 
-    private void removeValuesFromSingleCellNumbers(Cell cell, Set<Integer> values) {
+    private boolean removeValuesFromSingleCellNumbers(Cell cell, Set<Integer> values) {
+        int size = cell.getNumbersSize();
+
         List<Integer> toRemove = cell.getNumbers().stream()
                 .filter(i -> values.contains(i))
                 .toList();
 
         toRemove.forEach(i -> cell.removeNumber(i));
+
+        return size != cell.getNumbersSize();
     }
 
 }

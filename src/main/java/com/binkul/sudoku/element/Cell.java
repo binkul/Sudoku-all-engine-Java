@@ -80,6 +80,8 @@ public class Cell {
         return numbers.size() == 1;
     }
 
+    public boolean isNoneNumber() {return numbers.size() == 0; }
+
     public int getLastExistingNumber() {
         return numbers.stream().findFirst().orElse(ConstantData.NOT_SET_VALUE);
     }
