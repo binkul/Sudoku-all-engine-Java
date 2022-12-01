@@ -27,22 +27,26 @@ public class SimpleSolver implements Solver {
         boolean anyChange = false;
 
         for (Cell cell : cells) {
+            if (cell.getValue() != ConstantData.NOT_SET_VALUE) continue;    // tylko dla pól bez numeru
+
             int valueChange = cell.getValue();
             int sizeChange = cell.getNumbersSize();
-
-            if (cell.getValue() != ConstantData.NOT_SET_VALUE) continue;    // tylko dla pól bez numeru
 
             removeValuesFromSingleCellNumbers(cell, values);                // usuń z możliwych wartości wpisane numery
             if (cell.isNoneNumber()) {                                      // jak nc nie zostało to błąd
                 return Status.ERROR;
             } else if (cell.isOnlyOneNumber()) {                            // jak jest tylko jedna możliwa wartość to ją wpisz
                 cell.setValue(cell.getLastExistingNumber());
+                cell.setValueType(ValueType.SIMPLE_ALGORITHM);
             } else {                                                        // jak więcej możliwości, to druga część algorytmu
                 Set<Integer> numbers = sudoku.getExistingNumbers(i -> i.getRow() == 0, cell);
                 int value = cell.getNumbers().stream()
                                 .filter(i -> !numbers.contains(i))
                                 .findFirst().orElse(ConstantData.NOT_SET_VALUE);
-                if (value != ConstantData.NOT_SET_VALUE) cell.setValue(value);
+                if (value != ConstantData.NOT_SET_VALUE) {
+                    cell.setValue(value);
+                    cell.setValueType(ValueType.ADVANCE_ALGORITHM);
+                }
             }
 
             anyChange |= (valueChange != cell.getValue());
@@ -53,7 +57,7 @@ public class SimpleSolver implements Solver {
 
         //findAndSetSingleNumber();
 
-        return null;
+        return sudoku.isAllFilled() ? Status.FINISHED : Status.NOT_FINISHED;
     }
 
     private void findAndSetSingleNumber() {
