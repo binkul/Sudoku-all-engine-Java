@@ -22,42 +22,61 @@ public class SimpleSolver implements Solver {
     public Status Solve() {
 
         List<Cell> cells = sudoku.getCells().stream()
-                .filter(i -> i.getRow() == 0).toList();
-        Set<Integer> values = new HashSet<>(sudoku.getValues(i -> i.getRow() == 0));
+                .filter(i -> i.getRow() == 0)
+                .filter(i -> i.getValue() == ConstantData.NOT_SET_VALUE)
+                .toList();
         boolean anyChange = false;
 
         for (Cell cell : cells) {
-            if (cell.getValue() != ConstantData.NOT_SET_VALUE) continue;    // tylko dla pól bez numeru
-
-            int valueChange = cell.getValue();
             int sizeChange = cell.getNumbersSize();
 
-            removeValuesFromSingleCellNumbers(cell, values);                // usuń z możliwych wartości wpisane numery
-            if (cell.isNoneNumber()) {                                      // jak nc nie zostało to błąd
-                return Status.ERROR;
-            } else if (cell.isOnlyOneNumber()) {                            // jak jest tylko jedna możliwa wartość to ją wpisz
-                cell.setValue(cell.getLastExistingNumber());
-                cell.setValueType(ValueType.SIMPLE_ALGORITHM);
-            } else {                                                        // jak więcej możliwości, to druga część algorytmu
-                Set<Integer> numbers = sudoku.getExistingNumbers(i -> i.getRow() == 0, cell);
-                int value = cell.getNumbers().stream()
-                                .filter(i -> !numbers.contains(i))
-                                .findFirst().orElse(ConstantData.NOT_SET_VALUE);
-                if (value != ConstantData.NOT_SET_VALUE) {
-                    cell.setValue(value);
-                    cell.setValueType(ValueType.ADVANCE_ALGORITHM);
-                }
-            }
+            if (!findOnlyOneNumberAlgorithm(cell)) return Status.ERROR;
 
-            anyChange |= (valueChange != cell.getValue());
+//            Set<Integer> values = sudoku.getRowColSecValues(cell);
+//            removeValuesFromSingleCellNumbers(cell, values);                // usuń z możliwych wartości wpisane numery
+//            if (cell.isNoneNumber()) {                                      // jak nc nie zostało to błąd
+//                return Status.ERROR;
+//            } else if (cell.isOnlyOneNumber()) {                            // jak jest tylko jedna możliwa wartość to ją wpisz
+//                cell.setValue(cell.getLastExistingNumber());
+//                cell.setValueType(ValueType.SIMPLE_ALGORITHM);
+//            } else {                                                        // jak więcej możliwości, to druga część algorytmu//
+//                findNotRepeatedValueAlgorithm(cell);
+//            }
+
+            anyChange |= cell.getColumn() != ConstantData.NOT_SET_VALUE;
             anyChange |= (sizeChange != cell.getNumbersSize());
         }
 
-        //removeValuesFromAllSudokuCells();
-
-        //findAndSetSingleNumber();
-
         return sudoku.isAllFilled() ? Status.FINISHED : Status.NOT_FINISHED;
+    }
+
+    private boolean findOnlyOneNumberAlgorithm(Cell cell) {
+        Set<Integer> values = sudoku.getRowColSecValues(cell);
+        removeValuesFromSingleCellNumbers(cell, values);                // usuń z możliwych wartości wpisane numery
+
+        if (cell.isNoneNumber()) {                                      // jak nc nie zostało to błąd
+            return false;
+        } else if (cell.isOnlyOneNumber()) {                            // jak jest tylko jedna możliwa wartość to ją wpisz
+            cell.setValue(cell.getLastExistingNumber());
+            cell.setValueType(ValueType.SIMPLE_ALGORITHM);
+        } else {                                                        // jak więcej możliwości, to druga część algorytmu//
+            findNotRepeatedValueAlgorithm(cell);
+        }
+
+        return true;
+    }
+
+    private void findNotRepeatedValueAlgorithm(Cell cell) {
+        Set<Integer> numbers = sudoku.getExistingNumbers(i -> i.getRow() == 0, cell);
+
+        int value = cell.getNumbers().stream()
+                .filter(i -> !numbers.contains(i))
+                .findFirst().orElse(ConstantData.NOT_SET_VALUE);
+
+        if (value != ConstantData.NOT_SET_VALUE) {
+            cell.setValue(value);
+            cell.setValueType(ValueType.ADVANCE_ALGORITHM);
+        }
     }
 
     private void findAndSetSingleNumber() {
@@ -78,16 +97,12 @@ public class SimpleSolver implements Solver {
         }
     }
 
-    private boolean removeValuesFromSingleCellNumbers(Cell cell, Set<Integer> values) {
-        int size = cell.getNumbersSize();
-
+    private void removeValuesFromSingleCellNumbers(Cell cell, Set<Integer> values) {
         List<Integer> toRemove = cell.getNumbers().stream()
                 .filter(i -> values.contains(i))
                 .toList();
 
         toRemove.forEach(i -> cell.removeNumber(i));
-
-        return size != cell.getNumbersSize();
     }
 
 }
