@@ -79,6 +79,7 @@ public class Sudoku {
 
     public Set<Integer> getExistingNumbers(Predicate<Cell> position, Cell actualCell) {
         return getCells().stream()
+                .filter(i -> i.getValue() == ConstantData.NOT_SET_VALUE)
                 .filter(i -> !i.equals(actualCell))
                 .filter(position)
                 .map(Cell::getNumbers)

@@ -20,33 +20,23 @@ public class SimpleSolver implements Solver {
 
     @Override
     public Status Solve() {
+        boolean anyChange;
 
-        List<Cell> cells = sudoku.getCells().stream()
-                .filter(i -> i.getRow() == 0)
-                .filter(i -> i.getValue() == ConstantData.NOT_SET_VALUE)
-                .toList();
-        boolean anyChange = false;
+        do {
+            anyChange = false;
+            List<Cell> cells = sudoku.getCells().stream()
+                    .filter(i -> i.getValue() == ConstantData.NOT_SET_VALUE)
+                    .toList();
 
-        for (Cell cell : cells) {
-            int sizeChange = cell.getNumbersSize();
+            for (Cell cell : cells) {
+                int sizeChange = cell.getNumbersSize();
 
-            if (!findOnlyOneNumberAlgorithm(cell)) return Status.ERROR;
+                if (!findOnlyOneNumberAlgorithm(cell)) return Status.ERROR;
 
-//            Set<Integer> values = sudoku.getRowColSecValues(cell);
-//            removeValuesFromSingleCellNumbers(cell, values);                // usuń z możliwych wartości wpisane numery
-//            if (cell.isNoneNumber()) {                                      // jak nc nie zostało to błąd
-//                return Status.ERROR;
-//            } else if (cell.isOnlyOneNumber()) {                            // jak jest tylko jedna możliwa wartość to ją wpisz
-//                cell.setValue(cell.getLastExistingNumber());
-//                cell.setValueType(ValueType.SIMPLE_ALGORITHM);
-//            } else {                                                        // jak więcej możliwości, to druga część algorytmu//
-//                findNotRepeatedValueAlgorithm(cell);
-//            }
-
-            anyChange |= cell.getColumn() != ConstantData.NOT_SET_VALUE;
-            anyChange |= (sizeChange != cell.getNumbersSize());
-        }
-
+                anyChange |= cell.getValue() != ConstantData.NOT_SET_VALUE;
+                anyChange |= (sizeChange != cell.getNumbersSize());
+            }
+        } while (anyChange);
         return sudoku.isAllFilled() ? Status.FINISHED : Status.NOT_FINISHED;
     }
 
@@ -67,7 +57,11 @@ public class SimpleSolver implements Solver {
     }
 
     private void findNotRepeatedValueAlgorithm(Cell cell) {
-        Set<Integer> numbers = sudoku.getExistingNumbers(i -> i.getRow() == 0, cell);
+        Set<Integer> numbers = sudoku.getExistingNumbers(i -> i.getRow() == cell.getRow(), cell);
+        Set<Integer> numbersCol = sudoku.getExistingNumbers(i -> i.getColumn() == cell.getColumn(), cell);
+        Set<Integer> numbersSection = sudoku.getExistingNumbers(i -> i.getSection() == cell.getSection(), cell);
+        numbers.addAll(numbersCol);
+        numbers.addAll(numbersSection);
 
         int value = cell.getNumbers().stream()
                 .filter(i -> !numbers.contains(i))
