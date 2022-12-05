@@ -8,6 +8,8 @@ import com.binkul.sudoku.element.ValueType;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class SimpleSolver implements Solver {
@@ -24,14 +26,15 @@ public class SimpleSolver implements Solver {
 
         do {
             anyChange = false;
-            List<Cell> cells = sudoku.getCells().stream()
-                    .filter(i -> i.getValue() == ConstantData.NOT_SET_VALUE)
-                    .toList();
 
-            for (Cell cell : cells) {
+            for (Cell cell : sudoku.getCells()) {
+                if (cell.getValue() != ConstantData.NOT_SET_VALUE) continue;
+
                 int sizeChange = cell.getNumbersSize();
 
-                if (!findOnlyOneNumberAlgorithm(cell)) return Status.ERROR;
+                if (!findOnlyOneNumberAlgorithm(cell)) {
+                    return Status.ERROR;
+                }
 
                 anyChange |= cell.getValue() != ConstantData.NOT_SET_VALUE;
                 anyChange |= (sizeChange != cell.getNumbersSize());
@@ -57,38 +60,34 @@ public class SimpleSolver implements Solver {
     }
 
     private void findNotRepeatedValueAlgorithm(Cell cell) {
-        Set<Integer> numbers = sudoku.getExistingNumbers(i -> i.getRow() == cell.getRow(), cell);
-        Set<Integer> numbersCol = sudoku.getExistingNumbers(i -> i.getColumn() == cell.getColumn(), cell);
-        Set<Integer> numbersSection = sudoku.getExistingNumbers(i -> i.getSection() == cell.getSection(), cell);
-        numbers.addAll(numbersCol);
-        numbers.addAll(numbersSection);
-
-        int value = cell.getNumbers().stream()
-                .filter(i -> !numbers.contains(i))
-                .findFirst().orElse(ConstantData.NOT_SET_VALUE);
-
-        if (value != ConstantData.NOT_SET_VALUE) {
-            cell.setValue(value);
-            cell.setValueType(ValueType.ADVANCE_ALGORITHM);
-        }
+        if (tryToSetValue(cell, getUniqueNumbers(i -> i.getRow() == cell.getRow()))) return;
+        if (tryToSetValue(cell, getUniqueNumbers(i -> i.getColumn() == cell.getColumn()))) return;
+        tryToSetValue(cell, getUniqueNumbers(i -> i.getSection() == cell.getSection()));
     }
 
-    private void findAndSetSingleNumber() {
-        sudoku.getCells().stream()
+    private boolean tryToSetValue(Cell cell, List<Integer> uniqueNumbers) {
+        if (uniqueNumbers.size() > 0) {
+            cell.getNumbers().stream()
+                    .filter(i -> uniqueNumbers.contains(i))
+                    .forEach(i -> {
+                        cell.setValue(i);
+                        cell.setValueType(ValueType.ADVANCE_ALGORITHM);
+                    });
+        }
+        return cell.getValue() != ConstantData.NOT_SET_VALUE;
+    }
+
+    private List<Integer> getUniqueNumbers(Predicate<Cell> predicate) {
+        return sudoku.getCells().stream()
                 .filter(i -> i.getValue() == ConstantData.NOT_SET_VALUE)
-                .filter(Cell::isOnlyOneNumber)
-                .forEach(i -> {
-                    i.setValue(i.getLastExistingNumber());
-                    i.setValueType(ValueType.SIMPLE_ALGORITHM);
-                });
-    }
-
-    private void removeValuesFromAllSudokuCells() {
-        List<Cell> cells = sudoku.getCells();
-        for (Cell cell : cells) {
-            Set<Integer> values = sudoku.getRowColSecValues(cell);
-            removeValuesFromSingleCellNumbers(cell, values);
-        }
+                .filter(predicate)
+                .map(i -> i.getNumbers())
+                .flatMap(i -> i.stream())
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet().stream()
+                .filter(i -> i.getValue() == 1)
+                .map(i -> i.getKey())
+                .collect(Collectors.toList());
     }
 
     private void removeValuesFromSingleCellNumbers(Cell cell, Set<Integer> values) {

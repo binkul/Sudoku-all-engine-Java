@@ -3,10 +3,12 @@ package com.binkul.sudoku;
 import com.binkul.sudoku.board.Sudoku;
 import com.binkul.sudoku.engine.SimpleSolver;
 import com.binkul.sudoku.engine.Solver;
+import com.binkul.sudoku.engine.Status;
 
 public class Application {
     public static void main(String[] args) {
         Sudoku sudoku = new Sudoku.SudokuBuilder()
+                .setCell(1, 1, 5)
                 .setCell(1, 2, 3)
                 .setCell(1, 5, 7)
 
@@ -23,8 +25,9 @@ public class Application {
                 .setCell(4, 5, 6)
                 .setCell(4, 9, 3)
 
+                .setCell(5, 1, 4)
                 .setCell(5, 4, 8)
-                .setCell(5, 7, 3)
+                .setCell(5, 6, 3)
                 .setCell(5, 9, 1)
 
                 .setCell(6, 1, 7)
@@ -36,7 +39,9 @@ public class Application {
                 .setCell(7, 8, 8)
 
                 .setCell(8, 4, 4)
+                .setCell(8, 5, 1)
                 .setCell(8, 6, 9)
+                .setCell(8, 9, 5)
 
                 .setCell(9, 5, 8)
                 .setCell(9, 8, 7)
@@ -46,7 +51,15 @@ public class Application {
         System.out.println(sudoku);
 
         Solver solver = new SimpleSolver(sudoku);
-        solver.Solve();
-        System.out.println(sudoku);
+        if (solver.Solve() == Status.ERROR)
+            System.out.println("Sudoku has Error !!!");
+        else {
+            System.out.println(sudoku);
+
+            if (sudoku.isAllFilledCorrect())
+                System.out.println("Sudoku filled correct !!!");
+            else
+                System.out.println("Sudoku is not full filled !!!");
+        }
     }
 }

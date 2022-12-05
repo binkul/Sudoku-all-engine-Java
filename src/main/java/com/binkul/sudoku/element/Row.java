@@ -32,6 +32,10 @@ public class Row {
                 result.append(" ")
                         .append(cell.getValue())
                         .append("s|");
+            else if (cell.getValueType() == ValueType.ADVANCE_ALGORITHM)
+                result.append(" ")
+                        .append(cell.getValue())
+                        .append("a|");
             else
                 result.append(" ")
                         .append(cell.getValue())
